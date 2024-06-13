@@ -1,3 +1,5 @@
+import { openai } from "@ai-sdk/openai";
+import { embed } from "ai";
 import fs from "fs";
 import path from "path";
 
@@ -6,9 +8,11 @@ export type ImageMetadata = {
   metadata: {
     title: string;
     description: string;
-    vibe: string[];
+    vibes: string[];
   };
 };
+
+export const embeddingModel = openai.embedding("text-embedding-ada-002");
 
 /**
  * Asynchronously gets all `.jpg` files in the specified directory.
@@ -50,3 +54,23 @@ export async function writeAllMetadataToFile(
     throw error;
   }
 }
+
+export async function getMetadataFile(path: string): Promise<ImageMetadata[]> {
+  try {
+    const rawFile = await fs.promises.readFile(path, { encoding: "utf-8" });
+    const file = JSON.parse(rawFile) as ImageMetadata[];
+    return file;
+  } catch (error) {
+    console.error("Error reading file:", error);
+    throw error; // Re-throw the error for further handling if necessary
+  }
+}
+
+export const generateEmbedding = async (value: string): Promise<number[]> => {
+  const input = value.replaceAll("\n", " ");
+  const { embedding } = await embed({
+    model: embeddingModel,
+    value: input,
+  });
+  return embedding;
+};

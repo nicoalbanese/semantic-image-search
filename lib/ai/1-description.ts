@@ -8,13 +8,17 @@ import fs from "fs";
 dotenv.config();
 
 async function main() {
-  const files = await getJpgFiles("public/images/test/");
+  const files = await getJpgFiles("public/images/");
   console.log("files to process:\n", files);
 
   const images: ImageMetadata[] = [];
 
   for (const file of files) {
-    const path = `public/images/test/${file}`;
+    console.clear();
+    console.log(
+      `Generating description for ${file} (${files.indexOf(file) + 1}/${files.length})`,
+    );
+    const path = `public/images/${file}`;
     const result = await generateObject({
       model: openai("gpt-4o"),
       schema: z.object({
@@ -23,7 +27,7 @@ async function main() {
           description: z
             .string()
             .describe("A one sentence description of the image"),
-          vibe: z.array(z.string()),
+          vibes: z.array(z.string()),
         }),
       }),
       maxTokens: 512,
@@ -40,9 +44,10 @@ async function main() {
         },
       ],
     });
-    images.push({ path, metadata: result.object.image });
+    images.push({ path: `/images/${file}`, metadata: result.object.image });
   }
   await writeAllMetadataToFile(images, "imagesWithMetadata.json");
+  console.log("All images processed!");
 }
 
 main().catch(console.error);
