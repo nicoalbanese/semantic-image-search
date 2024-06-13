@@ -28,7 +28,7 @@ async function main() {
 
   // map over it and embed each .metadata key
   for (const image of imagesWithMetadata) {
-    console.clear();
+    // console.clear();
     console.log(
       `Generating embedding for ${image.path} (${imagesWithMetadata.indexOf(image) + 1}/${imagesWithMetadata.length})`,
     );
@@ -44,18 +44,20 @@ async function main() {
       `Saving ${image.path} to the DB (${imagesWithMetadata.indexOf(image) + 1}/${imagesWithMetadata.length})`,
     );
     // push to db
-    const dbImage = await saveImage({
-      title: image.metadata.title,
-      description: image.metadata.description,
-      vibes: image.metadata.vibes,
-      id: nanoid(),
-      path: image.path,
-      embedding,
-    });
-    console.log(dbImage);
+    try {
+      const dbImage = await saveImage({
+        title: image.metadata.title,
+        description: image.metadata.description,
+        vibes: image.metadata.vibes,
+        id: nanoid(),
+        path: image.path,
+        embedding,
+      });
+    } catch (e) {
+      console.error(e);
+    }
   }
   console.log("Successfully embedded and saved all images!");
-  process.exit(0);
 }
 
 main().catch(console.error);

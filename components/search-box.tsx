@@ -36,6 +36,7 @@ export function SearchBox({ query }: { query?: string }) {
       <div className="relative flex items-center">
         <SearchIcon className="absolute left-4 w-5 h-5 text-gray-500" />
         <Input
+          autoFocus
           value={input}
           onChange={(e) => setInput(e.target.value)}
           className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-blue-500"

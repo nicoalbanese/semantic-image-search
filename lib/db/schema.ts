@@ -32,7 +32,7 @@ export const dbImageSchema = z.object({
   title: z.string(),
   path: z.string(),
   description: z.string(),
-  vibes: z.array(z.string()).max(3),
+  vibes: z.array(z.string()),
   similarity: z.number().optional(),
 });
 
