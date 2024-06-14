@@ -20,31 +20,53 @@ To read more about using these font, please visit the Next.js documentation:
 **/
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useOptimistic, useRef, useState, useTransition } from "react";
+import { SearchQuery } from "./search-query";
 
 export function SearchBox({ query }: { query?: string }) {
   const [input, setInput] = useState(query ?? "");
+  const [optimisticQuery, setOptimsticQuery] = useOptimistic(query);
+  const inputRef = useRef<HTMLInputElement>(null);
+  let [_, startTransition] = useTransition();
+  const resetQuery = () => {
+    startTransition(() => {
+      setInput("");
+      setOptimsticQuery("");
+      router.push(`/`);
+      router.refresh();
+      inputRef.current?.focus();
+    });
+  };
   const router = useRouter();
+
   return (
-    <form
-      className="w-full mx-auto"
-      onSubmit={(e) => {
-        e.preventDefault();
-        router.push(`?q=${encodeURI(input)}`);
-      }}
-    >
-      <div className="relative flex items-center">
-        <SearchIcon className="absolute left-4 w-5 h-5 text-gray-500" />
-        <Input
-          autoFocus
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-blue-500"
-          placeholder="Search..."
-          type="search"
-        />
-      </div>
-    </form>
+    <div className="flex flex-col">
+      <form
+        className="w-full mx-auto mb-4"
+        onSubmit={(e) => {
+          e.preventDefault();
+          startTransition(() => {
+            setOptimsticQuery(input);
+            let newParams = new URLSearchParams([["q", input]]);
+            router.push(`?${newParams}`);
+          });
+        }}
+      >
+        <div className="relative flex items-center">
+          <SearchIcon className="absolute left-4 w-5 h-5 text-gray-500" />
+          <Input
+            autoFocus
+            value={input}
+            ref={inputRef}
+            onChange={(e) => setInput(e.target.value)}
+            className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-blue-500"
+            placeholder="Search..."
+            type="search"
+          />
+        </div>
+      </form>
+      <SearchQuery query={optimisticQuery} resetQuery={resetQuery} />
+    </div>
   );
 }
 
