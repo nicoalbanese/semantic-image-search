@@ -22,18 +22,20 @@ import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { Button } from "./ui/button";
+import { debounce } from "lodash";
+import { X } from "lucide-react";
 
 export function SearchBox({ query }: { query?: string }) {
   const [input, setInput] = useState(query ?? "");
   const inputRef = useRef<HTMLInputElement>(null);
   let [_, startTransition] = useTransition();
   const router = useRouter();
-  const search = () => {
+  const search = debounce(() => {
     startTransition(() => {
       let newParams = new URLSearchParams([["q", input]]);
       input.length === 0 ? router.push("/") : router.push(`?${newParams}`);
     });
-  };
+  }, 250);
   const resetQuery = () => {
     // startTransition(() => {
     setInput("");
@@ -47,6 +49,12 @@ export function SearchBox({ query }: { query?: string }) {
     if (input.length > 1) {
       search();
     }
+    if (input.length === 0 && query) {
+      resetQuery();
+    }
+    return () => {
+      search.cancel();
+    };
   }, [input]);
 
   return (
@@ -75,12 +83,12 @@ export function SearchBox({ query }: { query?: string }) {
           />
           {input.length > 0 ? (
             <Button
-              className="absolute right-2 text-gray-400"
+              className="absolute right-2 text-gray-400 rounded-full h-8 w-8"
               variant="ghost"
-              size={"sm"}
+              size={"icon"}
               onClick={() => resetQuery()}
             >
-              X
+              <X height="16" width="16" />
             </Button>
           ) : null}
         </div>
