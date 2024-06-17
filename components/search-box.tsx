@@ -30,12 +30,19 @@ export function SearchBox({ query }: { query?: string }) {
   const inputRef = useRef<HTMLInputElement>(null);
   let [_, startTransition] = useTransition();
   const router = useRouter();
+  const markStale = () => {
+    router.push(
+      query
+        ? "?q=" + new URLSearchParams(query) + "&stale=true"
+        : "?stale=true",
+    );
+  };
   const search = debounce(() => {
     startTransition(() => {
       let newParams = new URLSearchParams([["q", input]]);
       input.length === 0 ? router.push("/") : router.push(`?${newParams}`);
     });
-  }, 250);
+  }, 300);
   const resetQuery = () => {
     // startTransition(() => {
     setInput("");
@@ -47,6 +54,7 @@ export function SearchBox({ query }: { query?: string }) {
 
   useEffect(() => {
     if (input.length > 1) {
+      markStale();
       search();
     }
     if (input.length === 0 && query) {

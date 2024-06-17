@@ -1,6 +1,9 @@
 import { CardGridSkeleton } from "@/components/card-grid-skeleton";
-import { ImageList } from "@/components/image-list";
+import { ImageListStreamed } from "@/components/image-list-streamed";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { SearchBox } from "@/components/search-box";
+import { getImagesStreamed } from "@/lib/db/api";
+import { cn } from "@/lib/utils";
 import { unstable_noStore } from "next/cache";
 import { Suspense } from "react";
 
@@ -8,7 +11,7 @@ export const dynamic = "force-dynamic";
 export default async function Home({
   searchParams,
 }: {
-  searchParams: { q?: string };
+  searchParams: { q?: string; stale?: string };
 }) {
   unstable_noStore();
   return (
@@ -24,13 +27,31 @@ export default async function Home({
       </p>
       <div className="border-border border-t pt-4 space-y-4">
         <SearchBox query={searchParams.q} />
-        <Suspense
-          fallback={<CardGridSkeleton />}
-          key={JSON.stringify(searchParams)}
-        >
-          <ImageList query={searchParams.q} />
+        <Suspense fallback={<CardGridSkeleton />}>
+          <ImageList query={searchParams.q} stale={searchParams.stale} />
         </Suspense>
       </div>
     </main>
   );
 }
+
+const ImageList = async ({
+  query,
+  stale,
+}: {
+  query?: string;
+  stale?: string;
+}) => {
+  const { images, status } = await getImagesStreamed(query);
+
+  return (
+    <div className="relative">
+      <div className={cn(stale === "true" ? "opacity-60" : "")}>
+        <ImageListStreamed images={images} />
+      </div>
+      {stale === "true" || status ? (
+        <LoadingSpinner status={status} stale={stale === "true"} />
+      ) : null}
+    </div>
+  );
+};
