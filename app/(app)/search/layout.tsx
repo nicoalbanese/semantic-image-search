@@ -19,7 +19,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </p>
       <div className="border-border border-t pt-4 space-y-4">
         <SearchBox query={searchParams.get("q")} />
-        <Fragment key={searchParams.get("q")}>{children}</Fragment>
+        <Fragment key={searchParams.get("q")}>
+          <div className="relative">{children}</div>
+        </Fragment>
       </div>
     </main>
   );

@@ -5,7 +5,6 @@ import { DBImage } from "@/lib/db/schema";
 import { StreamableValue, useStreamableValue } from "ai/rsc";
 import { useSearchParams } from "next/navigation";
 import { NoImagesFound } from "./no-images-found";
-import { SearchBox } from "./search-box";
 import { useTransition } from "react";
 import { ImageStreamStatus, cn } from "@/lib/utils";
 import { LoadingSpinner } from "./loading-spinner";
@@ -19,10 +18,10 @@ export const ImageListStreamed = (props: {
 
   const searchParams = useSearchParams();
 
-  const [loading, startTransition] = useTransition();
+  const [loading] = useTransition();
 
   return (
-    <div>
+    <div className="">
       <div className={cn("", loading ? "opacity-50" : "")}>
         {images &&
         images.length === 0 &&
