@@ -20,20 +20,21 @@ To read more about using these font, please visit the Next.js documentation:
 **/
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
-import { TransitionStartFunction, useEffect, useRef, useState } from "react";
+import {
+  TransitionStartFunction,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { Button } from "./ui/button";
 import { debounce } from "lodash";
 import { X } from "lucide-react";
 
-export function SearchBox({
-  query,
-  startTransition,
-}: {
-  query: string | null;
-  startTransition: TransitionStartFunction;
-}) {
+export function SearchBox({ query }: { query: string | null }) {
   const [input, setInput] = useState(query ?? "");
   const inputRef = useRef<HTMLInputElement>(null);
+  const [_, startTransition] = useTransition();
 
   const router = useRouter();
 
@@ -46,7 +47,7 @@ export function SearchBox({
           : router.push(`?${newParams}`);
       });
     }
-  }, 0);
+  }, 300);
 
   const resetQuery = () => {
     startTransition(() => {
