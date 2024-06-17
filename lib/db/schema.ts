@@ -12,10 +12,6 @@ export const images = pgTable(
     title: text("title").notNull(),
     description: text("description").notNull(),
     path: text("path").notNull(),
-    vibes: text("vibes")
-      .array()
-      .notNull()
-      .default(sql`ARRAY[]::text[]`),
     embedding: vector("embedding", { dimensions: 1536 }).notNull(),
   },
   (table) => ({
@@ -32,7 +28,6 @@ export const dbImageSchema = z.object({
   title: z.string(),
   path: z.string(),
   description: z.string(),
-  vibes: z.array(z.string()),
   similarity: z.number().optional(),
 });
 

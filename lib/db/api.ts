@@ -1,21 +1,35 @@
 "use server";
 
-import { cosineDistance, desc, gt, or, sql } from "drizzle-orm";
+import {
+  cosineDistance,
+  desc,
+  getTableColumns,
+  gt,
+  or,
+  sql,
+} from "drizzle-orm";
 import { db } from ".";
 import { DBImage, images } from "./schema";
 import { generateEmbedding } from "../ai/utils";
 import { createStreamableValue } from "ai/rsc";
+import { kv } from "@vercel/kv";
+import { ImageStreamStatus } from "../utils";
 
 export const findSimilarContent = async (description: string) => {
+  const { embedding: e, ...rest } = getTableColumns(images);
+  const imagesWithoutEmbedding = {
+    ...rest,
+    embedding: sql<number[]>`ARRAY[]::integer[]`,
+  };
+
   const embedding = await generateEmbedding(description);
-  console.log(embedding);
   const similarity = sql<number>`1 - (${cosineDistance(images.embedding, embedding)})`;
   const similarGuides = await db
-    .select({ image: images, similarity })
+    .select({ image: imagesWithoutEmbedding, similarity })
     .from(images)
-    .where(gt(similarity, 0.3))
+    .where(gt(similarity, 0.28))
     .orderBy((t) => desc(t.similarity))
-    .limit(10);
+    .limit(12);
 
   return similarGuides;
 };
@@ -28,7 +42,6 @@ export const findImageByQuery = async (query: string) => {
       or(
         sql`title ILIKE ${"%" + query + "%"}`,
         sql`description ILIKE ${"%" + query + "%"}`,
-        sql`vibes @> ARRAY[${query}]::text[]`,
       ),
     );
   return result;
@@ -68,13 +81,41 @@ function uniqueItemsByObject(items: DBImage[]): DBImage[] {
 }
 
 export const getImagesStreamed = async (query?: string) => {
+  // await new Promise((resolve) => setTimeout(resolve, 2000));
+
   const imgs = createStreamableValue<DBImage[]>();
+  const status = createStreamableValue<ImageStreamStatus>({
+    regular: true,
+    semantic: false,
+  });
+
   (async () => {
     try {
-      if (query === undefined) {
-        const i = await db.select().from(images);
+      const queryFormatted = query
+        ? "q:" + query?.replaceAll(" ", "_")
+        : "all_images";
+      const cached = await kv.get<DBImage[]>(queryFormatted);
+      console.log(queryFormatted, cached ? "HIT" : "MISS");
+      if (cached) {
+        imgs.done(cached);
+        status.done({ regular: false, semantic: false });
+        return { images: imgs.value, status: status.value };
+      }
+
+      const { embedding, ...rest } = getTableColumns(images);
+      const imagesWithoutEmbedding = {
+        ...rest,
+        embedding: sql<number[]>`ARRAY[]::integer[]`,
+      };
+      if (query === undefined || query.length < 3) {
+        const i = await db
+          .select(imagesWithoutEmbedding)
+          .from(images)
+          .limit(20);
         imgs.done(i);
+        await kv.set("all_images", JSON.stringify(i));
       } else {
+        status.update({ semantic: true, regular: false });
         const iN = await findImageByQuery(query);
         imgs.update(
           iN.map((img) => ({
@@ -83,19 +124,20 @@ export const getImagesStreamed = async (query?: string) => {
           })),
         );
         const i = await findSimilarContent(query);
-        imgs.done(
-          uniqueItemsByObject(
-            [...iN, ...i].map((img) => ({
-              ...img.image,
-              similarity: img.similarity,
-            })),
-          ),
+        const aggregated = uniqueItemsByObject(
+          [...iN, ...i].map((img) => ({
+            ...img.image,
+            similarity: img.similarity,
+          })),
         );
+
+        imgs.done(aggregated);
+        await kv.set(queryFormatted, JSON.stringify(aggregated));
       }
+      status.done({ regular: false, semantic: false });
     } catch (e) {
       console.error(e);
-      throw Error();
     }
   })();
-  return imgs.value;
+  return { images: imgs.value, status: status.value };
 };

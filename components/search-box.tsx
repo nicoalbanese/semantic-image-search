@@ -20,24 +20,34 @@ To read more about using these font, please visit the Next.js documentation:
 **/
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
-import { useOptimistic, useRef, useState, useTransition } from "react";
-import { SearchQuery } from "./search-query";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { Button } from "./ui/button";
 
 export function SearchBox({ query }: { query?: string }) {
   const [input, setInput] = useState(query ?? "");
-  const [optimisticQuery, setOptimsticQuery] = useOptimistic(query);
   const inputRef = useRef<HTMLInputElement>(null);
   let [_, startTransition] = useTransition();
-  const resetQuery = () => {
+  const router = useRouter();
+  const search = () => {
     startTransition(() => {
-      setInput("");
-      setOptimsticQuery("");
-      router.push(`/`);
-      router.refresh();
-      inputRef.current?.focus();
+      let newParams = new URLSearchParams([["q", input]]);
+      input.length === 0 ? router.push("/") : router.push(`?${newParams}`);
     });
   };
-  const router = useRouter();
+  const resetQuery = () => {
+    // startTransition(() => {
+    setInput("");
+    router.push(`/`);
+    router.refresh();
+    inputRef.current?.focus();
+    // });
+  };
+
+  useEffect(() => {
+    if (input.length > 1) {
+      search();
+    }
+  }, [input]);
 
   return (
     <div className="flex flex-col">
@@ -45,11 +55,7 @@ export function SearchBox({ query }: { query?: string }) {
         className="w-full mx-auto mb-4"
         onSubmit={(e) => {
           e.preventDefault();
-          startTransition(() => {
-            setOptimsticQuery(input);
-            let newParams = new URLSearchParams([["q", input]]);
-            router.push(`?${newParams}`);
-          });
+          search();
         }}
       >
         <div className="relative flex items-center">
@@ -59,13 +65,26 @@ export function SearchBox({ query }: { query?: string }) {
             value={input}
             ref={inputRef}
             onChange={(e) => setInput(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-blue-500"
+            onKeyDown={(event) => {
+              if (event.metaKey && event.key === "Backspace") {
+                resetQuery();
+              }
+            }}
+            className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-blue-500"
             placeholder="Search..."
-            type="search"
           />
+          {input.length > 0 ? (
+            <Button
+              className="absolute right-2 text-gray-400"
+              variant="ghost"
+              size={"sm"}
+              onClick={() => resetQuery()}
+            >
+              X
+            </Button>
+          ) : null}
         </div>
       </form>
-      <SearchQuery query={optimisticQuery} resetQuery={resetQuery} />
     </div>
   );
 }

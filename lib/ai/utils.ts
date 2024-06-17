@@ -8,11 +8,10 @@ export type ImageMetadata = {
   metadata: {
     title: string;
     description: string;
-    vibes: string[];
   };
 };
 
-export const embeddingModel = openai.embedding("text-embedding-ada-002");
+export const embeddingModel = openai.embedding("text-embedding-3-small");
 
 /**
  * Asynchronously gets all `.jpg` files in the specified directory.

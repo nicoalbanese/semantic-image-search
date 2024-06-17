@@ -1,3 +1,5 @@
+import { Button } from "./ui/button";
+
 export const SearchQuery = ({
   query,
   resetQuery,
@@ -5,13 +7,23 @@ export const SearchQuery = ({
   query?: string;
   resetQuery: () => void;
 }) => {
-  if (query === undefined) return <div className="w-full h-6" />;
   return (
-    <div className="text-zinc-700 h-6">
-      search query: <span className="font-medium italic">{query}</span>
-      <button className="ml-4" onClick={resetQuery}>
-        clear
-      </button>
+    <div className="text-zinc-700 h-6 flex items-center">
+      {query === undefined || query.length === 0 ? (
+        <div>Search for an image!</div>
+      ) : (
+        <div>
+          Search query: <span className="font-medium italic">{query}</span>
+          <Button
+            className="ml-4"
+            variant={"outline"}
+            size={"sm"}
+            onClick={resetQuery}
+          >
+            clear
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

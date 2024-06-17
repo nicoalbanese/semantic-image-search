@@ -2,13 +2,15 @@ import { openai } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import dotenv from "dotenv";
 import { z } from "zod";
-import { ImageMetadata, getJpgFiles, writeAllMetadataToFile } from "./utils";
+import { ImageMetadata, writeAllMetadataToFile } from "./utils";
 import fs from "fs";
+import { list } from "@vercel/blob";
 
 dotenv.config();
 
 async function main() {
-  const files = await getJpgFiles("public/images/");
+  const blobs = await list();
+  const files = blobs.blobs.map((b) => b.url);
   console.log("files to process:\n", files);
 
   const images: ImageMetadata[] = [];
@@ -27,7 +29,6 @@ async function main() {
           description: z
             .string()
             .describe("A one sentence description of the image"),
-          vibes: z.array(z.string()),
         }),
       }),
       maxTokens: 512,
@@ -38,13 +39,13 @@ async function main() {
             { type: "text", text: "Describe the image in detail." },
             {
               type: "image",
-              image: fs.readFileSync(path),
+              image: file,
             },
           ],
         },
       ],
     });
-    images.push({ path: `/images/${file}`, metadata: result.object.image });
+    images.push({ path: file, metadata: result.object.image });
   }
   await writeAllMetadataToFile(images, "imagesWithMetadata.json");
   console.log("All images processed!");

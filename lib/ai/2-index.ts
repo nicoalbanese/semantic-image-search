@@ -45,10 +45,9 @@ async function main() {
     );
     // push to db
     try {
-      const dbImage = await saveImage({
+      await saveImage({
         title: image.metadata.title,
         description: image.metadata.description,
-        vibes: image.metadata.vibes,
         id: nanoid(),
         path: image.path,
         embedding,
