@@ -49,7 +49,7 @@ const ImageList = async ({
       <div className={cn(stale === "true" ? "opacity-60" : "")}>
         <ImageListStreamed images={images} />
       </div>
-      {stale === "true" || status ? (
+      {stale === "true" || (status && query) ? (
         <LoadingSpinner status={status} stale={stale === "true"} />
       ) : null}
     </div>
