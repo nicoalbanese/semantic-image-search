@@ -42,9 +42,13 @@ export function ImageCard({
       {show ? null : (
         <Image
           alt={image.title}
-          className="rounded-lg object-cover"
+          className="w-full h-full rounded-lg object-cover"
           height="200"
           src={image.path}
+          style={{
+            aspectRatio: "400/200",
+            objectFit: "cover",
+          }}
           width="400"
         />
       )}
