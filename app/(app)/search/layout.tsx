@@ -1,11 +1,13 @@
 "use client";
 
 import { SearchBox } from "@/components/search-box-copy";
+import { unstable_noStore } from "next/cache";
 import { useSearchParams } from "next/navigation";
 import { Fragment } from "react";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
+  unstable_noStore();
   return (
     <main className="p-8 space-y-4">
       <h1 className="font-medium text-2xl">
