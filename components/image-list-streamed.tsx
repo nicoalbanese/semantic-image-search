@@ -27,14 +27,18 @@ export const ImageListStreamed = (props: {
         query={searchParams.get("q")}
         startTransition={startTransition}
       />
-      <div className={cn("", loading ? "opacity-50" : "")}>
+      <div>
         {images &&
         images.length === 0 &&
         loading === false &&
         streamLoading === false ? (
           <NoImagesFound query={searchParams.get("q") ?? ""} />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2 relative">
+          <div
+            className={cn(
+              "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2 relative",
+            )}
+          >
             {images &&
               images?.map((image) => (
                 <ImageCard
