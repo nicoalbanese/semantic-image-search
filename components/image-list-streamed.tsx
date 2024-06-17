@@ -5,34 +5,49 @@ import { DBImage } from "@/lib/db/schema";
 import { StreamableValue, useStreamableValue } from "ai/rsc";
 import { useSearchParams } from "next/navigation";
 import { NoImagesFound } from "./no-images-found";
+import { SearchBox } from "./search-box";
+import { useTransition } from "react";
+import { ImageStreamStatus, cn } from "@/lib/utils";
+import { LoadingSpinner } from "./loading-spinner";
 
-export const ImageListStreamed = ({
-  images,
-}: {
+export const ImageListStreamed = (props: {
   images: StreamableValue<DBImage[]>;
+  status: StreamableValue<ImageStreamStatus>;
 }) => {
-  const [data, _, loading] = useStreamableValue(images);
+  const [images] = useStreamableValue(props.images);
+  const [status, , streamLoading] = useStreamableValue(props.status);
+
   const searchParams = useSearchParams();
 
-  if (
-    data &&
-    data.length === 0 &&
-    loading === false &&
-    searchParams.get("stale") === null
-  )
-    return <NoImagesFound query={searchParams.get("q") ?? ""} />;
+  const [loading, startTransition] = useTransition();
+
   return (
     <div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2">
-        {data
-          ? data.map((i) => (
-              <ImageCard
-                key={"image_" + i.id}
-                image={i}
-                similarity={i.similarity}
-              />
-            ))
-          : null}
+      <SearchBox
+        query={searchParams.get("q")}
+        startTransition={startTransition}
+      />
+      <div className={cn("", loading ? "opacity-50" : "")}>
+        {images &&
+        images.length === 0 &&
+        loading === false &&
+        streamLoading === false ? (
+          <NoImagesFound query={searchParams.get("q") ?? ""} />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2 relative">
+            {images &&
+              images?.map((image) => (
+                <ImageCard
+                  key={"image_" + image.id}
+                  image={image}
+                  similarity={image.similarity}
+                />
+              ))}
+            {loading || streamLoading ? (
+              <LoadingSpinner status={status} />
+            ) : null}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -20,41 +20,43 @@ To read more about using these font, please visit the Next.js documentation:
 **/
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { TransitionStartFunction, useEffect, useRef, useState } from "react";
 import { Button } from "./ui/button";
 import { debounce } from "lodash";
 import { X } from "lucide-react";
 
-export function SearchBox({ query }: { query?: string }) {
+export function SearchBox({
+  query,
+  startTransition,
+}: {
+  query: string | null;
+  startTransition: TransitionStartFunction;
+}) {
   const [input, setInput] = useState(query ?? "");
   const inputRef = useRef<HTMLInputElement>(null);
-  let [_, startTransition] = useTransition();
+
   const router = useRouter();
-  const markStale = () => {
-    router.push(
-      query
-        ? "?q=" + new URLSearchParams(query) + "&stale=true"
-        : "?stale=true",
-    );
-  };
+
   const search = debounce(() => {
-    startTransition(() => {
-      let newParams = new URLSearchParams([["q", input]]);
-      input.length === 0 ? router.push("/") : router.push(`?${newParams}`);
-    });
+    if (input !== query) {
+      startTransition(() => {
+        let newParams = new URLSearchParams([["q", input]]);
+        input.length === 0 ? router.push("/") : router.push(`?${newParams}`);
+      });
+    }
   }, 300);
+
   const resetQuery = () => {
-    // startTransition(() => {
-    setInput("");
-    router.push(`/`);
-    router.refresh();
-    inputRef.current?.focus();
-    // });
+    startTransition(() => {
+      setInput("");
+      router.push(`/`);
+      router.refresh();
+      inputRef.current?.focus();
+    });
   };
 
   useEffect(() => {
     if (input.length > 1) {
-      markStale();
       search();
     }
     if (input.length === 0 && query) {
@@ -93,6 +95,7 @@ export function SearchBox({ query }: { query?: string }) {
             <Button
               className="absolute right-2 text-gray-400 rounded-full h-8 w-8"
               variant="ghost"
+              type="reset"
               size={"icon"}
               onClick={() => resetQuery()}
             >

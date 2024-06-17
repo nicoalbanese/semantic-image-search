@@ -6,39 +6,29 @@
 "use client";
 
 import { ImageStreamStatus } from "@/lib/utils";
-import { StreamableValue, useStreamableValue } from "ai/rsc";
 
-export function LoadingSpinner({
-  status,
-  stale,
-}: {
-  status: StreamableValue<ImageStreamStatus>;
-  stale: boolean;
-}) {
-  const [data, _, loading] = useStreamableValue(status);
-  if (loading || stale) {
-    return (
-      <div className="absolute h-full w-full bg-white z-10 top-0 opacity-90 flex items-start justify-center">
-        {true ? (
-          <div className="flex flex-col items-center space-y-4 pt-16">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-900 border-t-transparent dark:border-gray-50 dark:border-t-transparent" />
-            <p className="text-gray-500 dark:text-gray-400">
-              Searching
-              {data?.regular ? " for direct matches" : " for semantic results"}
-              ...
-            </p>
+export function LoadingSpinner({ status }: { status?: ImageStreamStatus }) {
+  return (
+    <div className="absolute h-full w-full bg-white z-10 top-0 opacity-90 flex items-start justify-center">
+      {true ? (
+        <div className="flex flex-col items-center space-y-4 pt-16">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-900 border-t-transparent dark:border-gray-50 dark:border-t-transparent" />
+          <p className="text-gray-500 dark:text-gray-400">
+            Searching
+            {status?.regular ? " for direct matches" : " for semantic results"}
+            ...
+          </p>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center space-y-4">
+          <div className="bg-green-500 rounded-full p-3">
+            <CheckIcon className="h-6 w-6 text-white" />
           </div>
-        ) : (
-          <div className="flex flex-col items-center space-y-4">
-            <div className="bg-green-500 rounded-full p-3">
-              <CheckIcon className="h-6 w-6 text-white" />
-            </div>
-            <p className="text-green-500 font-medium">Search Completed</p>
-          </div>
-        )}
-      </div>
-    );
-  }
+          <p className="text-green-500 font-medium">Search Completed</p>
+        </div>
+      )}
+    </div>
+  );
 }
 
 function CheckIcon(props: any) {

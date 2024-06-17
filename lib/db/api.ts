@@ -95,7 +95,7 @@ export const getImagesStreamed = async (query?: string) => {
         ? "q:" + query?.replaceAll(" ", "_")
         : "all_images";
       const cached = await kv.get<DBImage[]>(queryFormatted);
-      console.log(queryFormatted, cached ? "HIT" : "MISS");
+      // console.log(queryFormatted, cached ? "HIT" : "MISS");
       if (cached) {
         imgs.done(cached);
         status.done({ regular: false, semantic: false });

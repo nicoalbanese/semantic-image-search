@@ -12,7 +12,7 @@ export function CardGridSkeleton() {
 export function SkeletonCard() {
   return (
     <div className="flex flex-col space-y-3">
-      <Skeleton className="h-72 min-w-48 rounded-xl" />
+      <Skeleton className="h-[450px] min-w-48 rounded-xl" />
     </div>
   );
 }

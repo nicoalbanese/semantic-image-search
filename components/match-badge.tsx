@@ -8,10 +8,12 @@ export const MatchBadge = ({
   similarity?: number;
 }) => {
   return (
-    <div className="flex">
+    <div className="flex space-x-2">
       <Badge variant={"secondary"}>{type} match</Badge>
       {type === "semantic" ? (
-        <Badge variant={"outline"}>similarity: {similarity?.toFixed(3)}</Badge>
+        <Badge variant={"default"} className="bg-green-500 text-black">
+          similarity: {similarity?.toFixed(3)}
+        </Badge>
       ) : null}
     </div>
   );
