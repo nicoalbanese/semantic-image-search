@@ -34,7 +34,7 @@ export function SearchBox({
         input.length === 0 ? router.push("/") : router.push(`?${newParams}`);
       });
     }
-  }, 200);
+  }, 300);
 
   const resetQuery = () => {
     startTransition(() => {
