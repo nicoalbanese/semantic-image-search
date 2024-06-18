@@ -70,19 +70,19 @@ export const getImagesStreamed = async (query?: string) => {
 
   (async () => {
     try {
-      const formattedQuery = query
-        ? "q:" + query?.replaceAll(" ", "_")
-        : "all_images";
-
-      const cached = await kv.get<DBImage[]>(formattedQuery);
-      if (cached) {
-        streamableImages.done(cached);
-        streamableStatus.done({ regular: false, semantic: false });
-        return {
-          images: streamableImages.value,
-          status: streamableStatus.value,
-        };
-      }
+      // const formattedQuery = query
+      //   ? "q:" + query?.replaceAll(" ", "_")
+      //   : "all_images";
+      //
+      // const cached = await kv.get<DBImage[]>(formattedQuery);
+      // if (cached) {
+      //   streamableImages.done(cached);
+      //   streamableStatus.done({ regular: false, semantic: false });
+      //   return {
+      //     images: streamableImages.value,
+      //     status: streamableStatus.value,
+      //   };
+      // }
 
       if (query === undefined || query.length < 3) {
         const allImages = await db
@@ -90,7 +90,7 @@ export const getImagesStreamed = async (query?: string) => {
           .from(images)
           .limit(20);
         streamableImages.done(allImages);
-        await kv.set("all_images", JSON.stringify(allImages));
+        // await kv.set("all_images", JSON.stringify(allImages));
       } else {
         streamableStatus.update({ semantic: true, regular: false });
         const directMatches = await findImageByQuery(query);
@@ -109,7 +109,7 @@ export const getImagesStreamed = async (query?: string) => {
         );
 
         streamableImages.done(allMatches);
-        await kv.set(formattedQuery, JSON.stringify(allMatches));
+        // await kv.set(formattedQuery, JSON.stringify(allMatches));
       }
       streamableStatus.done({ regular: false, semantic: false });
     } catch (e) {
