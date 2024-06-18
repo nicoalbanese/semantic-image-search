@@ -9,7 +9,7 @@ import { ImageStreamStatus } from "@/lib/utils";
 
 export function LoadingSpinner({ status }: { status?: ImageStreamStatus }) {
   return (
-    <div className="absolute h-full w-full bg-white z-10 top-0 opacity-90 flex items-start justify-center">
+    <div className="absolute h-full w-full bg-white z-10 top-0 flex items-start justify-center">
       <div className="flex flex-col items-center space-y-4 pt-16">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-900 border-t-transparent dark:border-gray-50 dark:border-t-transparent" />
         <p className="text-gray-500 dark:text-gray-400">
