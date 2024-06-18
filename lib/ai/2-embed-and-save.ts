@@ -1,4 +1,3 @@
-import { openai } from "@ai-sdk/openai";
 import dotenv from "dotenv";
 import { embeddingModel, getMetadataFile } from "./utils";
 import { embed } from "ai";
@@ -36,7 +35,7 @@ async function main() {
     // create embedding
     const { embedding } = await embed({
       model: embeddingModel,
-      value: JSON.stringify(image.metadata),
+      value: image.metadata.title + "\n" + image.metadata.description,
     });
     //
 

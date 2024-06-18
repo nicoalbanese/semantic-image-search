@@ -9,6 +9,7 @@
     "lint": "next lint",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
+    "upload": "tsx lib/ai/0-upload.ts",
     "generate-metadata": "tsx lib/ai/1-generate-metadata.ts",
     "embed-and-save": "tsx lib/ai/2-embed-and-save.ts"
   },

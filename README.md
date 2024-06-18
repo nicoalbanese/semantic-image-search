@@ -20,8 +20,8 @@
 
 - [Next.js](https://nextjs.org) App Router
 - React Server Components (RSCs), Suspense, and Server Actions
-- [Vercel AI SDK](https://sdk.vercel.ai/docs) for streaming chat UI
-- Support for OpenAI (default), Anthropic, Cohere, Hugging Face, or custom AI chat models and/or LangChain
+- [Vercel AI SDK](https://sdk.vercel.ai/docs) for multimodal prompting, generating and embedding metadata
+- Support for OpenAI (default), Gemini, Anthropic, Cohere, or custom AI chat models
 - [shadcn/ui](https://ui.shadcn.com)
   - Styling with [Tailwind CSS](https://tailwindcss.com)
   - [Radix UI](https://radix-ui.com) for headless component primitives
@@ -31,7 +31,7 @@
 
 ## Model Providers
 
-This template ships with OpenAI `gpt-4o` as the default. However, thanks to the [Vercel AI SDK](https://sdk.vercel.ai/docs), you can switch LLM providers to [Anthropic](https://anthropic.com), [Cohere](https://cohere.com/), [Hugging Face](https://huggingface.co), or using [LangChain](https://js.langchain.com) with just a few lines of code.
+This template ships with OpenAI `GPT-4o` as the default. However, thanks to the [Vercel AI SDK](https://sdk.vercel.ai/docs), you can switch LLM providers to [Anthropic](https://anthropic.com), [Cohere](https://cohere.com/), [Hugging Face](https://huggingface.co), or using [LangChain](https://js.langchain.com) with just a few lines of code.
 
 ## Deploy Your Own
 
@@ -87,21 +87,25 @@ To get your application ready for Semantic search, you will have to complete thr
 3. Iterate over each image, embed the metadata, and then save to the database.
 
 ### Upload Images
-To upload images, you can upload them directly to your Blob instance on Vercel in the 'browser' section
+Put the images you want to upload in the `images-to-index` directory at the root of your application. Run the following command.
+```bash
+pnpm run upload
+```
+Depending on how many photos you are uploading, this step could take a while. This script will upload the images to your Vercel Blob store.
 
 ### Generate Metadata
 Run the following command.
 ```bash
 pnpm run generate-metadata
 ```
-Depending on how many photos you are uploading, this step could take a while. 
+Depending on how many photos you are uploading, this step could take a while. This script will generate metadata for each of the images you uploaded in the previous step.
 
 ### Embed Metadata and Save to Database
 Run the following command.
 ```bash
 pnpm run embed-and-save
 ```
-Depending on how many photos you are uploading, this step could take a while. 
+Depending on how many photos you are uploading, this step could take a while. This script will embed the descriptions generated in the previous step and save them to your Vercel Postgres instance.
 
 ## Starting the Server
 Run the following command
