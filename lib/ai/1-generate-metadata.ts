@@ -46,7 +46,7 @@ async function main() {
     });
     images.push({ path: file, metadata: result.object.image });
   }
-  await writeAllMetadataToFile(images, "imagesWithMetadata.json");
+  await writeAllMetadataToFile(images, "images-with-metadata.json");
   console.log("All images processed!");
 }
 

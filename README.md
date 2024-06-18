@@ -20,18 +20,18 @@
 
 - [Next.js](https://nextjs.org) App Router
 - React Server Components (RSCs), Suspense, and Server Actions
-- [Vercel AI SDK](https://sdk.vercel.ai/docs) for multimodal prompting, generating and embedding metadata
+- [Vercel AI SDK](https://sdk.vercel.ai/docs) for multimodal prompting, generating & embedding image metadata, and streaming images from Server to Client
 - Support for OpenAI (default), Gemini, Anthropic, Cohere, or custom AI chat models
 - [shadcn/ui](https://ui.shadcn.com)
   - Styling with [Tailwind CSS](https://tailwindcss.com)
   - [Radix UI](https://radix-ui.com) for headless component primitives
 - Query caching with [Vercel KV](https://vercel.com/storage/kv)
-- Embeddings powered by [Vercel Postgres](https://vercel.com/storage/kv), [ pgvector ](https://github.com/pgvector/pgvector-node#drizzle-orm), and [ Drizzle ORM ](https://orm.drizzle.team/)
+- Embeddings powered by [Vercel Postgres](https://vercel.com/storage/kv), [pgvector](https://github.com/pgvector/pgvector-node#drizzle-orm), and [Drizzle ORM](https://orm.drizzle.team/)
 - File (image) storage with [Vercel Blob](https://vercel.com/storage/blob)
 
 ## Model Providers
 
-This template ships with OpenAI `GPT-4o` as the default. However, thanks to the [Vercel AI SDK](https://sdk.vercel.ai/docs), you can switch LLM providers to [Anthropic](https://anthropic.com), [Cohere](https://cohere.com/), [Hugging Face](https://huggingface.co), or using [LangChain](https://js.langchain.com) with just a few lines of code.
+This template ships with OpenAI `GPT-4o` as the default. However, thanks to the [Vercel AI SDK](https://sdk.vercel.ai/docs), you can switch LLM providers to [Gemini](https://gemini.google.com/), [Anthropic](https://anthropic.com), [Cohere](https://cohere.com/), and [more](https://sdk.vercel.ai/providers/ai-sdk-providers) with just a few lines of code.
 
 ## Deploy Your Own
 
@@ -87,7 +87,7 @@ To get your application ready for Semantic search, you will have to complete thr
 3. Iterate over each image, embed the metadata, and then save to the database.
 
 ### Upload Images
-Put the images you want to upload in the `images-to-index` directory at the root of your application. Run the following command.
+Put the images (in .jpg format) you want to upload in the `images-to-index` directory at the root of your application. Run the following command.
 ```bash
 pnpm run upload
 ```

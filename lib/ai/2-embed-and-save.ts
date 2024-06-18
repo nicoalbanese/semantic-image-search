@@ -23,11 +23,11 @@ const saveImage = async (image: DBImage) => {
 
 async function main() {
   // read metadata json file
-  const imagesWithMetadata = await getMetadataFile("imagesWithMetadata.json");
+  const imagesWithMetadata = await getMetadataFile("images-with-metadata.json");
 
   // map over it and embed each .metadata key
   for (const image of imagesWithMetadata) {
-    // console.clear();
+    console.clear();
     console.log(
       `Generating embedding for ${image.path} (${imagesWithMetadata.indexOf(image) + 1}/${imagesWithMetadata.length})`,
     );
@@ -56,6 +56,7 @@ async function main() {
     }
   }
   console.log("Successfully embedded and saved all images!");
+  process.exit(0);
 }
 
 main().catch(console.error);

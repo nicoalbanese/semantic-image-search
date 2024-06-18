@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import { getJpgFiles } from "./utils";
-import { put } from "@vercel/blob";
+import { list, put } from "@vercel/blob";
 import fs from "fs";
 
 dotenv.config();
@@ -8,8 +8,14 @@ dotenv.config();
 async function main() {
   const basePath = "images-to-index";
   const files = await getJpgFiles(basePath);
+  const { blobs } = await list();
 
   for (const file of files) {
+    const exists = blobs.some((blob) => blob.pathname === file);
+    if (exists) {
+      console.log(`File (${file}) already exists in Blob store`);
+      continue;
+    }
     const filePath = basePath + "/" + file;
     const fileContent = fs.readFileSync(filePath);
 
@@ -25,6 +31,7 @@ async function main() {
     }
   }
   console.log("All images uploaded!");
+  process.exit(0);
 }
 
 main().catch(console.error);
