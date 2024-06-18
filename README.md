@@ -1,5 +1,5 @@
 <a href="https://semantic-search.vercel.ai/">
-  <img alt="Next.js 14 and App Router Semantic Search." src="https://semantic-search.vercel.ai/opengraph-image.png">
+  <img alt="Next.js 14 and App Router Semantic Search." src="https://semantic-image-search.vercel.app/opengraph-image.png">
   <h1 align="center">Semantic Image Search</h1>
 </a>
 
