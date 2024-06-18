@@ -14,7 +14,7 @@ export default function Home({
   noStore();
 
   return (
-    <Suspense fallback={<CardGridSkeleton />}>
+    <Suspense fallback={<CardGridSkeleton />} key={searchParams.q}>
       <ImageList query={searchParams.q} />
     </Suspense>
   );
