@@ -7,6 +7,7 @@
 
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
+import { SearchIcon } from "lucide-react";
 import { TransitionStartFunction, useEffect, useRef, useState } from "react";
 import { Button } from "./ui/button";
 import { debounce } from "lodash";
@@ -57,7 +58,7 @@ export function SearchBox({
   }, [input]);
 
   return (
-    <div className="pt-4 flex flex-col">
+    <div className="flex flex-col">
       <form
         className="w-full mx-auto mb-4"
         onSubmit={(e) => {
@@ -68,7 +69,6 @@ export function SearchBox({
         <div className="relative flex items-center">
           <SearchIcon className="absolute left-4 w-5 h-5 text-gray-500" />
           <Input
-            autoFocus
             value={input}
             ref={inputRef}
             minLength={3}
@@ -97,25 +97,5 @@ export function SearchBox({
         </div>
       </form>
     </div>
-  );
-}
-
-function SearchIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="11" cy="11" r="8" />
-      <path d="m21 21-4.3-4.3" />
-    </svg>
   );
 }

@@ -17,10 +17,10 @@ export const ImageListStreamed = (props: {
   const [images] = useStreamableValue(props.images);
   const [status, , streamLoading] = useStreamableValue(props.status);
 
+  const [loading, startTransition] = useTransition();
+
   const searchParams = useSearchParams();
   const query = searchParams.get("q");
-
-  const [loading, startTransition] = useTransition();
 
   return (
     <div>
