@@ -8,7 +8,7 @@ import { DBImage, dbImageSchema, images } from "../db/schema";
 
 dotenv.config();
 
-export const client = postgres(process.env.DATABASE_URL!);
+export const client = postgres(process.env.POSTGRES_URL!);
 export const db = drizzle(client);
 
 const saveImage = async (image: DBImage) => {

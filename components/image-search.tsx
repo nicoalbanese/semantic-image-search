@@ -10,7 +10,7 @@ import { useTransition } from "react";
 import { ImageStreamStatus, cn } from "@/lib/utils";
 import { LoadingSpinner } from "./loading-spinner";
 
-export const ImageListStreamed = (props: {
+export const ImageSearch = (props: {
   images: StreamableValue<DBImage[]>;
   status: StreamableValue<ImageStreamStatus>;
 }) => {

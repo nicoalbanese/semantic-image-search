@@ -1,5 +1,5 @@
 import { CardGridSkeleton } from "@/components/card-grid-skeleton";
-import { ImageListStreamed } from "@/components/image-list-streamed";
+import { ImageSearch } from "@/components/image-search";
 import { getImagesStreamed } from "@/lib/db/api";
 import { unstable_noStore as noStore } from "next/cache";
 import Link from "next/link";
@@ -35,15 +35,15 @@ export default function Home({
       </p>
       <div className="border-border border-t pt-4 space-y-4">
         <Suspense fallback={<CardGridSkeleton />}>
-          <ImageSearch query={searchParams.q} />
+          <SuspendedImageSearch query={searchParams.q} />
         </Suspense>
       </div>
     </main>
   );
 }
 
-const ImageSearch = async ({ query }: { query?: string }) => {
+const SuspendedImageSearch = async ({ query }: { query?: string }) => {
   const { images, status } = await getImagesStreamed(query);
 
-  return <ImageListStreamed images={images} status={status} />;
+  return <ImageSearch images={images} status={status} />;
 };

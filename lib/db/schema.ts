@@ -1,4 +1,3 @@
-import { sql } from "drizzle-orm";
 import { varchar, index, pgTable, vector, text } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 import { z } from "zod";
