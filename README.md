@@ -85,23 +85,25 @@ pnpm run db:push
 
 ## Prepare your Images (Indexing Step)
 To get your application ready for Semantic search, you will have to complete three steps.
-1. Upload Images to Storage.
-2. Send Images to a Large Language Model to generate metadata (title, description).
-3. Iterate over each image, embed the metadata, and then save to the database.
+1. Upload Images to storage
+2. Send Images to a Large Language Model to generate metadata (title, description)
+3. Iterate over each image, embed the metadata, and then save to the database
 
 ### Upload Images
-Put the images (in .jpg format) you want to upload in the `images-to-index` directory at the root of your application. Run the following command.
+Put the images you want to upload in the `images-to-index` directory (.jpg format) at the root of your application. Run the following command.
 ```bash
 pnpm run upload
 ```
-Depending on how many photos you are uploading, this step could take a while. This script will upload the images to your Vercel Blob store.
+This script will upload the images to your Vercel Blob store.
+Depending on how many photos you are uploading, this step could take a while.
 
 ### Generate Metadata
 Run the following command.
 ```bash
 pnpm run generate-metadata
 ```
-Depending on how many photos you are uploading, this step could take a while. This script will generate metadata for each of the images you uploaded in the previous step.
+This script will generate metadata for each of the images you uploaded in the previous step.
+Depending on how many photos you are uploading, this step could take a while.
 
 ### Embed Metadata and Save to Database
 Run the following command.
