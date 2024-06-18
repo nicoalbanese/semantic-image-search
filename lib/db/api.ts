@@ -15,28 +15,28 @@ import { createStreamableValue } from "ai/rsc";
 import { kv } from "@vercel/kv";
 import { ImageStreamStatus } from "../utils";
 
-export const findSimilarContent = async (description: string) => {
-  const { embedding: e, ...rest } = getTableColumns(images);
-  const imagesWithoutEmbedding = {
-    ...rest,
-    embedding: sql<number[]>`ARRAY[]::integer[]`,
-  };
+const { embedding: _, ...rest } = getTableColumns(images);
+const imagesWithoutEmbedding = {
+  ...rest,
+  embedding: sql<number[]>`ARRAY[]::integer[]`,
+};
 
+export const findSimilarContent = async (description: string) => {
   const embedding = await generateEmbedding(description);
   const similarity = sql<number>`1 - (${cosineDistance(images.embedding, embedding)})`;
   const similarGuides = await db
     .select({ image: imagesWithoutEmbedding, similarity })
     .from(images)
-    .where(gt(similarity, 0.28))
+    .where(gt(similarity, 0.28)) // experiment with this value based on your embedding model
     .orderBy((t) => desc(t.similarity))
-    .limit(12);
+    .limit(10);
 
   return similarGuides;
 };
 
 export const findImageByQuery = async (query: string) => {
   const result = await db
-    .select({ image: images, similarity: sql<number>`1` })
+    .select({ image: imagesWithoutEmbedding, similarity: sql<number>`1` })
     .from(images)
     .where(
       or(
@@ -45,25 +45,6 @@ export const findImageByQuery = async (query: string) => {
       ),
     );
   return result;
-};
-
-export const getImages = async (query?: string): Promise<DBImage[]> => {
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-  try {
-    if (query === undefined) {
-      const i = await db.select().from(images);
-      return i;
-    } else {
-      const i = await findSimilarContent(query);
-      return i.map((img) => ({
-        ...img.image,
-        similarity: img.similarity,
-      }));
-    }
-  } catch (e) {
-    console.error(e);
-    throw Error();
-  }
 };
 
 function uniqueItemsByObject(items: DBImage[]): DBImage[] {
@@ -81,63 +62,59 @@ function uniqueItemsByObject(items: DBImage[]): DBImage[] {
 }
 
 export const getImagesStreamed = async (query?: string) => {
-  // await new Promise((resolve) => setTimeout(resolve, 2000));
-
-  const imgs = createStreamableValue<DBImage[]>();
-  const status = createStreamableValue<ImageStreamStatus>({
+  const streamableImages = createStreamableValue<DBImage[]>();
+  const streamableStatus = createStreamableValue<ImageStreamStatus>({
     regular: true,
     semantic: false,
   });
 
   (async () => {
     try {
-      const queryFormatted = query
+      const formattedQuery = query
         ? "q:" + query?.replaceAll(" ", "_")
         : "all_images";
-      const cached = await kv.get<DBImage[]>(queryFormatted);
-      // console.log(queryFormatted, cached ? "HIT" : "MISS");
+
+      const cached = await kv.get<DBImage[]>(formattedQuery);
       if (cached) {
-        imgs.done(cached);
-        status.done({ regular: false, semantic: false });
-        return { images: imgs.value, status: status.value };
+        streamableImages.done(cached);
+        streamableStatus.done({ regular: false, semantic: false });
+        return {
+          images: streamableImages.value,
+          status: streamableStatus.value,
+        };
       }
 
-      const { embedding, ...rest } = getTableColumns(images);
-      const imagesWithoutEmbedding = {
-        ...rest,
-        embedding: sql<number[]>`ARRAY[]::integer[]`,
-      };
       if (query === undefined || query.length < 3) {
-        const i = await db
+        const allImages = await db
           .select(imagesWithoutEmbedding)
           .from(images)
           .limit(20);
-        imgs.done(i);
-        await kv.set("all_images", JSON.stringify(i));
+        streamableImages.done(allImages);
+        await kv.set("all_images", JSON.stringify(allImages));
       } else {
-        status.update({ semantic: true, regular: false });
-        const iN = await findImageByQuery(query);
-        imgs.update(
-          iN.map((img) => ({
-            ...img.image,
-            similarity: img.similarity,
+        streamableStatus.update({ semantic: true, regular: false });
+        const directMatches = await findImageByQuery(query);
+        streamableImages.update(
+          directMatches.map((directMatch) => ({
+            ...directMatch.image,
+            similarity: directMatch.similarity,
           })),
         );
-        const i = await findSimilarContent(query);
-        const aggregated = uniqueItemsByObject(
-          [...iN, ...i].map((img) => ({
-            ...img.image,
-            similarity: img.similarity,
+        const semanticMatches = await findSimilarContent(query);
+        const allMatches = uniqueItemsByObject(
+          [...directMatches, ...semanticMatches].map((image) => ({
+            ...image.image,
+            similarity: image.similarity,
           })),
         );
 
-        imgs.done(aggregated);
-        await kv.set(queryFormatted, JSON.stringify(aggregated));
+        streamableImages.done(allMatches);
+        await kv.set(formattedQuery, JSON.stringify(allMatches));
       }
-      status.done({ regular: false, semantic: false });
+      streamableStatus.done({ regular: false, semantic: false });
     } catch (e) {
       console.error(e);
     }
   })();
-  return { images: imgs.value, status: status.value };
+  return { images: streamableImages.value, status: streamableStatus.value };
 };

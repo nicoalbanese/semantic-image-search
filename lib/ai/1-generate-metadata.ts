@@ -3,7 +3,6 @@ import { generateObject } from "ai";
 import dotenv from "dotenv";
 import { z } from "zod";
 import { ImageMetadata, writeAllMetadataToFile } from "./utils";
-import fs from "fs";
 import { list } from "@vercel/blob";
 
 dotenv.config();
@@ -11,6 +10,7 @@ dotenv.config();
 async function main() {
   const blobs = await list();
   const files = blobs.blobs.map((b) => b.url);
+
   console.log("files to process:\n", files);
 
   const images: ImageMetadata[] = [];
@@ -20,7 +20,6 @@ async function main() {
     console.log(
       `Generating description for ${file} (${files.indexOf(file) + 1}/${files.length})`,
     );
-    const path = `public/images/${file}`;
     const result = await generateObject({
       model: openai("gpt-4o"),
       schema: z.object({

@@ -8,13 +8,14 @@ export const MatchBadge = ({
   similarity?: number;
 }) => {
   return (
-    <div className="flex space-x-2">
-      <Badge variant={"secondary"}>{type} match</Badge>
+    <div className="">
       {type === "semantic" ? (
-        <Badge variant={"default"} className="bg-green-500 text-black">
-          similarity: {similarity?.toFixed(3)}
+        <Badge variant={"default"} className="bg-green-100 text-green-700">
+          Semantic Match: {similarity?.toFixed(3)}
         </Badge>
-      ) : null}
+      ) : (
+        <Badge variant={"secondary"}>Direct Match</Badge>
+      )}
     </div>
   );
 };

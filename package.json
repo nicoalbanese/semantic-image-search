@@ -9,8 +9,8 @@
     "lint": "next lint",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
-    "semantic-1": "tsx lib/ai/1-description.ts",
-    "semantic-2": "tsx lib/ai/2-index.ts"
+    "generate-metadata": "tsx lib/ai/1-generate-metadata.ts",
+    "embed-and-save": "tsx lib/ai/2-embed-and-save.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^0.0.28",
@@ -22,6 +22,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.31.2",
+    "geist": "^1.3.0",
     "lodash": "^4.17.21",
     "lucide-react": "^0.395.0",
     "nanoid": "^5.0.7",
@@ -29,6 +30,7 @@
     "postgres": "^3.4.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "sharp": "^0.33.4",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8"

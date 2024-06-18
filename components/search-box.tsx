@@ -35,6 +35,8 @@ export function SearchBox({
   const [input, setInput] = useState(query ?? "");
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const validQuery = input.length > 2;
+
   const router = useRouter();
 
   const search = debounce(() => {
@@ -56,7 +58,7 @@ export function SearchBox({
   };
 
   useEffect(() => {
-    if (input.length > 1) {
+    if (validQuery) {
       search();
     }
     if (input.length === 0 && query) {
@@ -68,12 +70,12 @@ export function SearchBox({
   }, [input]);
 
   return (
-    <div className="flex flex-col">
+    <div className="pt-4 flex flex-col">
       <form
         className="w-full mx-auto mb-4"
         onSubmit={(e) => {
           e.preventDefault();
-          search();
+          if (validQuery) search();
         }}
       >
         <div className="relative flex items-center">
@@ -82,13 +84,16 @@ export function SearchBox({
             autoFocus
             value={input}
             ref={inputRef}
+            minLength={3}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(event) => {
               if (event.metaKey && event.key === "Backspace") {
                 resetQuery();
               }
             }}
-            className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-blue-500"
+            className={
+              "w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-blue-500"
+            }
             placeholder="Search..."
           />
           {input.length > 0 ? (

@@ -18,6 +18,7 @@ export const ImageListStreamed = (props: {
   const [status, , streamLoading] = useStreamableValue(props.status);
 
   const searchParams = useSearchParams();
+  const query = searchParams.get("q");
 
   const [loading, startTransition] = useTransition();
 
@@ -32,7 +33,7 @@ export const ImageListStreamed = (props: {
         images.length === 0 &&
         loading === false &&
         streamLoading === false ? (
-          <NoImagesFound query={searchParams.get("q") ?? ""} />
+          <NoImagesFound query={query ?? ""} />
         ) : (
           <div
             className={cn(
