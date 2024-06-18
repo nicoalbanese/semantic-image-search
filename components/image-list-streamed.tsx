@@ -24,10 +24,7 @@ export const ImageListStreamed = (props: {
 
   return (
     <div>
-      <SearchBox
-        query={searchParams.get("q")}
-        startTransition={startTransition}
-      />
+      <SearchBox query={query} startTransition={startTransition} />
       <div>
         {images &&
         images.length === 0 &&
