@@ -25,6 +25,13 @@ export const ImageSearch = (props: {
 
   return (
     <div>
+      <pre>
+        {JSON.stringify(
+          { images: images?.length, loading, streamLoading },
+          null,
+          2,
+        )}
+      </pre>
       <SearchBox query={query} startTransition={startTransition} />
       <div>
         {images &&
